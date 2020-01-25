@@ -1,5 +1,5 @@
 Class {
 	#name : #CallCredentialFilter,
 	#superclass : #Object,
-	#category : #'Grpc-Core'
+	#category : #'Grpc-Core-Credentials'
 }
