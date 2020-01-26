@@ -10,12 +10,12 @@ Class {
 
 { #category : #constants }
 MetaData class >> LEGAL_KEY_REGEX [
-	^ '/^[0-9a-z_.-]+$/'
+	^ '^[0-9a-z_.-]+$'
 ]
 
 { #category : #constants }
 MetaData class >> LEGAL_NON_BINARY_VALUE_REGEX [
-	^ '/^[ -~]*$/'
+	^ '^[ -~]*$'
 ]
 
 { #category : #'instance creation' }
@@ -88,11 +88,13 @@ MetaData >> _getCoreRepresentation [
 { #category : #testing }
 MetaData >> add: key value: value [
 	| normalizedKey |
+	Transcript show:'MetaData add called';cr.
 	normalizedKey := self class normalizeKey: key.
 	self validate: normalizedKey value: value.
 	(internalRepr includesKey: normalizedKey)
 		ifTrue: [ | existingCollection |
 			existingCollection := internalRepr at: normalizedKey.
+			Transcript show:'MetaData adding ',key,'->',value;cr.
 			existingCollection add: value ]
 		ifFalse:
 			[ internalRepr at: normalizedKey put: (OrderedCollection with: value) ]
@@ -138,6 +140,7 @@ MetaData >> getMap [
 { #category : #testing }
 MetaData >> initialize [
 	options := Dictionary new.
+	internalRepr := Dictionary new.
 ]
 
 { #category : #accessing }
@@ -152,6 +155,11 @@ MetaData >> merge: other [
 			| newValue |
 			newValue := (internalRepr at: key) , value.
 			internalRepr at: key put: newValue ]
+]
+
+{ #category : #accessing }
+MetaData >> normalizeKey: key [
+	^ key asLowercase 
 ]
 
 { #category : #accessing }
@@ -199,18 +207,18 @@ MetaData >> toHttp2Headers [
 
 { #category : #testing }
 MetaData >> validate: key value: value [
-	(self isLegalKey: key)
+	(self class isLegalKey: key)
 		ifFalse: [ GrpcUtil
 				throw: 'Metadata key "' , key , '" contains illegal characters ' ].
 	value isNil
-		ifTrue: [ (self isBinaryKey: key)
+		ifTrue: [ (self class isBinaryKey: key)
 				ifTrue: [ (value isKindOf: ByteArray)
 						ifFalse: [ GrpcUtil
 								throw: 'keys that ends with "-bin" must have ByteArray values" ' ] ] ]
 		ifFalse: [ (value isKindOf: ByteArray)
 				ifTrue: [ GrpcUtil
 						throw: 'keys that dont end with "-bin" must have String values" ' ]
-				ifFalse: [ (self isLegalNonBnaryValue: value)
+				ifFalse: [ (self class isLegalNonBnaryValue: value)
 						ifFalse: [ GrpcUtil
 								throw: 'Metadata string "' , value , '" contains illegal characters ' ] ] ]
 ]

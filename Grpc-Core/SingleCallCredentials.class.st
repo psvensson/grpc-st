@@ -34,5 +34,6 @@ SingleCallCredentials >> createMetaData: options [
 
 { #category : #generating }
 SingleCallCredentials >> generateMetadata: options [
-	^ [ self createMetaData: options ] future.
+	Transcript show:'SingleCallCredential generateMetadata options: ',(options asString);cr.
+	^ ([ self createMetaData: options ] future)
 ]

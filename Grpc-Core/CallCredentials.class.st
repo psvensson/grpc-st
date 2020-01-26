@@ -46,6 +46,12 @@ CallCredentials >> generateMetadata: options [
 	^ self subclassResponsibility
 ]
 
+{ #category : #initialization }
+CallCredentials >> initialize [
+	creds := OrderedCollection new.
+	
+]
+
 { #category : #accessing }
 CallCredentials >> metadataGenerator [
 	^ metadataGenerator

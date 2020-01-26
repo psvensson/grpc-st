@@ -18,17 +18,24 @@ ComposedCallCredentials >> compose: callCredentials [
 	
 	| composed |
 	composed := ComposedCallCredentials new.
-	composed creds: creds,callCredentials .
+	composed creds: creds, (callCredentials creds) .
 	^ composed
 ]
 
 { #category : #generating }
-ComposedCallCredentials >> generateMetadata: options [
-	| base generated |
+ComposedCallCredentials >> createMetadata: options [
+	| base |
+	Transcript show:'ComposedCallCredential generateMetadata options: ',(options asString);cr.
 	base := MetaData new.
-	generated := GrpcUtil
+	( GrpcUtil
 		futuresAll:
-			(creds collect: [ :cred | [ cred generateMetadata: options ] future ]).
-	generated do: [ :each | base merge: each ].
+			(creds collect: [ :cred | [ cred generateMetadata: options ] future ]) )
+	onSuccessDo: [ :generated | generated do: [ :each | base merge: each ]].
 	^ base
+]
+
+{ #category : #generating }
+ComposedCallCredentials >> generateMetadata: options [
+	
+	^ [self createMetadata: options] future
 ]
