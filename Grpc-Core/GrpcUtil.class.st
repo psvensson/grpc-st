@@ -22,6 +22,28 @@ GrpcUtil class >> futuresAll: futures [
 ]
 
 { #category : #exceptionbuilder }
+GrpcUtil class >> getDefaultRootsData [
+	| DEFAULT_ROOTS_FILE_PATH defaultRootsData |
+	DEFAULT_ROOTS_FILE_PATH := OSEnvironment current asDictionary
+		at: 'GRPC_DEFAULT_SSL_ROOTS_FILE_PATH'.
+	DEFAULT_ROOTS_FILE_PATH isNil
+		ifFalse: [ DEFAULT_ROOTS_FILE_PATH
+				readStreamDo: [ :stream | defaultRootsData := stream contents asByteArray ] ].
+	^ defaultRootsData
+]
+
+{ #category : #exceptionbuilder }
 GrpcUtil class >> throw: string [
 	(Exception new messageText: string) signal
+]
+
+{ #category : #exceptionbuilder }
+GrpcUtil class >> verifyIsBufferOrNull: obj friendlyName: friendlyName [
+	obj isNil
+		ifFalse: [ (obj isKindOf: ByteArray)
+				ifFalse: [ | ex |
+					ex := Exception new.
+					ex
+						messageText: friendlyName , ', if provided, must be a ByteArray'.
+					ex signal ] ]
 ]

@@ -57,7 +57,6 @@ CallCredentialsTest >> testCombineMultipleGenerators [
 	makeAfterMsElapsedGenerator := [ :ms | 
 		[ :options :cb | 
 			| metaData |
-			Transcript show:'makeAfterMsElapsed block called';cr.
 			metaData := MetaData new.
 			metaData add: 'msElapsed' value: ms.
 			ms milliSeconds wait.
